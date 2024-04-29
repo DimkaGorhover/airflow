@@ -78,6 +78,33 @@ class TestSparkJobSpec:
         mock_validate.assert_called_once()
         mock_update_resources.assert_called_once()
 
+    def test_spark_job_metadata(self):
+        launcher = CustomObjectLauncher(
+            name="test-spark-job",
+            namespace="default",
+            kube_client=MagicMock(),
+            custom_obj_api=MagicMock(),
+            template_body={
+                "spark": {
+                    "metadata": {
+                        "labels": {
+                            "label-key": "label-value",
+                        },
+                        "annotations": {
+                            "annotation-key": "annotation-value",
+                        },
+                    },
+                    "spec": {
+                        "driver": {},
+                        "executor": {},
+                    }
+                },
+            },
+        )
+
+        assert launcher.body["metadata"]["labels"]["label-key"] == "label-value"
+        assert launcher.body["metadata"]["annotations"]["annotation-key"] == "annotation-value"
+
     def test_spark_job_spec_dynamicAllocation_enabled(self):
         entries = {
             "spec": {
